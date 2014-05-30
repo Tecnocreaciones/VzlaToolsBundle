@@ -1,0 +1,7 @@
+tecnocreaciones:
+            vzlatools:
+                    invalid_format_rif: Invalid format RIF.
+                    the_seniat_server_is_not_available_at_this_time: The SENIAT server is not available at this time.
+                    the_rif_does_not_exist: The RIF does not exist.
+                    invalid_check_digit: Invalid check digit.
+                    could_not_connect_to_server: Could not connect to server to validate.

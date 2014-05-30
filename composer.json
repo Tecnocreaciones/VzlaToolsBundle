@@ -1,0 +1,16 @@
+{
+    "name": "tecnocreaciones/vzla-tools-bundle",
+    "description": "Bundle for symfony2 for Venezuela Tools",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Carlos Mendoza",
+            "email": "inhack20@tecnocreaciones.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/symfony": "~2.*",
+        "leaseweb/api-caller-bundle": "1.0.*@dev"
+    }
+}
