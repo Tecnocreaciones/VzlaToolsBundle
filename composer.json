@@ -12,5 +12,9 @@
         "php": ">=5.3.3",
         "symfony/framework-bundle": "~2.1",
         "leaseweb/api-caller-bundle": "1.0.*@dev"
-    }
+    },
+    "autoload": {
+        "psr-0": { "Tecnocreaciones\\Vzla\\ToolsBundle\\TecnocreacionesVzlaToolsBundle": "" }
+    },
+    "target-dir": "Tecnocreaciones/Vzla/ToolsBundle/TecnocreacionesVzlaToolsBundle"
 }
