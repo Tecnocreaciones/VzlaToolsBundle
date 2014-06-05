@@ -14,7 +14,7 @@
         "leaseweb/api-caller-bundle": "1.0.*@dev"
     },
     "autoload": {
-        "psr-0": { "Tecnocreaciones\\Vzla\\ToolsBundle\\TecnocreacionesVzlaToolsBundle": "" }
+        "psr-0": { "Tecnocreaciones\\Vzla\\ToolsBundle": "" }
     },
-    "target-dir": "Tecnocreaciones/Vzla/ToolsBundle/TecnocreacionesVzlaToolsBundle"
+    "target-dir": "Tecnocreaciones/Vzla/ToolsBundle"
 }
