@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/symfony": "~2.*",
+        "symfony/framework-bundle": "~2.1",
         "leaseweb/api-caller-bundle": "1.0.*@dev"
     }
 }
