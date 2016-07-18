@@ -229,6 +229,36 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
         return $digitoVerificador;
     }
     
+    function completeLeftRif($rif) {
+        $rif = $this->normalizeRif($rif);
+        $digitos = str_split($rif);
+        $countRif = count($digitos);
+        //Rif completo
+        if($countRif == 10){
+            return $rif;
+        } else if($countRif == 9){
+            $rif .= $this->getCheckDigit($rif);
+            return $rif;
+        } else if($countRif < 9){
+            //Rif incompleto hay que completar con cero a la izquerda
+            $onlyNumber = "";
+            for($i = 1;$i < $countRif; $i++){
+                $onlyNumber .= $digitos[$i];
+            }
+            $newRif = $digitos[0].str_pad($onlyNumber,8,"0",STR_PAD_LEFT);
+            if(strlen($newRif) === 9) {
+                $newRif .= $this->getCheckDigit($newRif);
+            }
+            return $newRif;
+        }
+            
+    }
+    
+    private function getTypesRif() {
+        return ['V','E','J','P','G'];
+    }
+
+
     public function setContainer(\Symfony\Component\DependencyInjection\ContainerInterface $container = null) {
         $this->container = $container;
     }
