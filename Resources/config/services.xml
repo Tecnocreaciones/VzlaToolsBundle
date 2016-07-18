@@ -22,12 +22,6 @@
     </parameters>
     <services>
         <service id="tecnocreaciones_vzla_tools.rif" class="%tecnocreaciones_vzla_tools.rif_tool.class%">
-            <call method="setApiCaller">
-                <argument type="service" id="api_caller" />
-            </call>
-            <call method="setTranslator">
-                <argument type="service" id="translator" />
-            </call>
             <call method="setContainer">
                 <argument type="service" id="service_container" />
             </call>

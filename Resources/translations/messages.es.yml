@@ -1,7 +1,6 @@
-tecnocreaciones:
-            vzlatools:
-                    invalid_format_rif: Formato de RIF invalido.
-                    the_seniat_server_is_not_available_at_this_time: El servidor del SENIAT no se encuentra disponible en este momento.
-                    the_rif_does_not_exist: El RIF no existe.
-                    invalid_check_digit: Dígito verificador invalido.
-                    could_not_connect_to_server: No se pudo conectar con el servidor de validación del RIF.
+tecnocreaciones.vzlatools.invalid_check_digit: 'Dígito verificador invalido'
+tecnocreaciones.vzlatools.invalid_format_rif: 'Formato de RIF invalido'
+tecnocreaciones.vzlatools.the_seniat_server_is_not_available_at_this_time: 'El servidor del SENIAT no se encuentra disponible en este momento'
+tecnocreaciones.vzlatools.the_rif_does_not_exist: 'El RIF no existe'
+tecnocreaciones.vzlatools.invalid_check_digit: 'Dígito verificador invalido'
+tecnocreaciones.vzlatools.could_not_connect_to_server: 'No se pudo conectar con el servidor de validación del RIF'

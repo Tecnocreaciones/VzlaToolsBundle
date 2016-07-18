@@ -46,19 +46,34 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
     
     protected $container;
 
-    private $cache = array();
-    
     public function getRif($rifString){
         $rif = new Rif();
-        
+        $rif->setOriginalRif($rifString);
         if($this->isValidFormat($rifString)){
             if($this->isValidCheckDigit($rifString)){
                 $parameters = array(
                     'rif' => $this->normalizeRif($rifString)
                 );
-                $request = new \Tecnocreaciones\Vzla\ToolsBundle\Call\HttpGetXml($this->url,null,$parameters);
-                $response = $this->getApiCaller()->call($request);
-                if($request->getStatusCode() == 404){
+                
+                $client = new \GuzzleHttp\Client();
+                $res = null;
+                try{
+                    $res = $client->request('GET', $this->url.'?'.http_build_query($parameters));
+                }  catch (\GuzzleHttp\Exception\RequestException $e){
+                    if ($e->hasResponse()) {
+                        if($e->getResponse()->getStatusCode() === 452){
+                            $rif
+                                ->setCodeResponse(Rif::STATUS_ERROR_RIF_DOES_NOT_EXIST)    
+                                ->setMessage(utf8_encode(((string)$e->getResponse()->getBody())));
+                        }
+                    }
+                }
+                if($res === null){
+                    return $rif;
+                }
+                $response = (string)$res->getBody();
+                
+                if($res->getStatusCode() == 404){
                     $rif
                     ->setCodeResponse(Rif::STATUS_ERROR_SERVER_DOWN)
                     ->setMessage($this->buildMessage('tecnocreaciones.vzlatools.the_seniat_server_is_not_available_at_this_time'));
@@ -122,71 +137,13 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
     }
     
     /**
-     * Obtener la información en formato Json
-     * 
-     * @param String $rif
-     * @return Json
-     * @throws Exception
-     */
-    public function getInfo() {
-        if ($this->isValidFormat()) {
-            if(function_exists('curl_init')) {
-                $this->url .= $this->_rif;
-
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $this->url);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-                $result = curl_exec ($ch);
-
-                if ($result) {
-                    try {
-                        if(substr($result,0,1)!= '<' ) {
-                            throw new Exception($result);
-                        }
-
-                        $xml = simplexml_load_string($result);
-
-                        if(!is_bool($xml)) {
-                            $elements = $xml->children('rif');
-                            $seniat = array();
-                            $this->_responseJson['code_result'] = 1;
-
-                            foreach($elements as $key => $node) {
-                                $index = strtolower($node->getName());
-                                $seniat[$index] = (string)$node;
-                            }
-                            $this->_responseJson['seniat'] = $seniat;
-                        }
-                    } catch(Exception $e) {
-                        $exception = explode(' ', $result, 2);
-                        $this->_responseJson['code_result'] =(int) $exception[0];
-                    }
-                } else {
-                    // No hay conexión a internet
-                    $this->_responseJson['code_result'] = 0;
-                }
-            } else {
-                // No hay soporte CURL
-                $this->_responseJson['code_result'] = -1;
-            } 
-        } else {
-            // Formato de RIF inválido
-            $this->_responseJson['code_result'] = -2;
-        }
-
-        return json_encode($this->_responseJson);
-    }
-    
-    /**
      * Validar formato del RIF
      * 
      * @return boolean 
      */
     public function isValidFormat($rif) {
         $rif = str_replace('-', '', strtoupper($rif));
-        $retorno = preg_match("/^([VEJPG]{1})([0-9]{9}$)/", $rif);
+        $retorno = (bool)preg_match("/^([VEJPG]{1})([0-9]{9}$)/", $rif);
         return $retorno;
     }
     
@@ -215,6 +172,30 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
             $digitos[3] *= 7; 
             $digitos[2] *= 2; 
             $digitos[1] *= 3; 
+
+            $digitoVerificador = $this->getCheckDigit($rif);
+            
+            if ($digitoVerificador != $digitos[9]) {
+                return false;
+            }
+        return true;
+    }
+    
+    function getCheckDigit($rif) {
+        $rif = str_replace('-', '', strtoupper($rif));
+            $digitos = str_split($rif);
+            //Rif invalido
+            if(count($digitos) < 9){
+                return null;
+            }
+            $digitos[8] *= 2; 
+            $digitos[7] *= 3; 
+            $digitos[6] *= 4; 
+            $digitos[5] *= 5; 
+            $digitos[4] *= 6; 
+            $digitos[3] *= 7; 
+            $digitos[2] *= 2; 
+            $digitos[1] *= 3; 
             
             // Determinar dígito especial según la inicial del RIF
             // Regla introducida por el SENIAT
@@ -235,59 +216,24 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
                     $digitoEspecial = 5;
                     break;
             }
-            
-            $suma = (array_sum($digitos) - $digitos[9]) + ($digitoEspecial*4);
+            $lastDigit = 0;
+            if(isset($digitos[9])){
+                $lastDigit = $digitos[9];
+            }
+            $suma = (array_sum($digitos) - $lastDigit) + ($digitoEspecial*4);
             $residuo = $suma % 11;
             $resta = 11 - $residuo;
             
             $digitoVerificador = ($resta >= 10) ? 0 : $resta;
             
-            if ($digitoVerificador != $digitos[9]) {
-                return false;
-            }
-        return true;
+        return $digitoVerificador;
     }
     
-    /**
-     * 
-     * @return \Lsw\ApiCallerBundle\Caller\LoggingApiCaller
-     */
-    public function getApiCaller() {
-        return $this->apiCaller;
-    }
-
-    /**
-     * 
-     * @param \Lsw\ApiCallerBundle\Caller\LoggingApiCaller $apiCaller
-     */
-    public function setApiCaller(\Lsw\ApiCallerBundle\Caller\LoggingApiCaller $apiCaller) {
-        $this->apiCaller = $apiCaller;
-    }
-    
-    /**
-     * 
-     * @return \Symfony\Component\Translation\TranslatorInterface
-     */
-    public function getTranslator() {
-        return $this->translator;
-    }
-
-    /**
-     * 
-     * @param \Symfony\Component\Translation\TranslatorInterface $translator
-     */
-    public function setTranslator(\Symfony\Component\Translation\TranslatorInterface $translator) {
-        $this->translator = $translator;
-    }
-
     public function setContainer(\Symfony\Component\DependencyInjection\ContainerInterface $container = null) {
         $this->container = $container;
     }
     
     private function buildMessage($message){
-        if($this->container->getParameter('tecnocreaciones_vzla_tools.rif.translate_message') == true){
-            return $this->translator->trans($message);
-        }
-        return $message;
+       return $this->container->get("translator")->trans($message,[],"messages");
     }
 }

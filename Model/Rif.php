@@ -44,7 +44,17 @@ class Rif
      */
     const STATUS_OK = 5;
     
+    /**
+     * Rif devuelto por el portal
+     * @var type 
+     */
     private $rif;
+    
+    /**
+     * Rif original
+     * @var type 
+     */
+    private $originalRif;
     
     private $name;
     
@@ -75,6 +85,26 @@ class Rif
      * @var boolean
      */
     private $valid = true;
+    
+    public function getRifFormated() {
+        $formated = "";
+        if($this->isValid() == true){
+            $rif = $this->rif;
+            $digitos = str_split($rif);
+            $lastKey = count($digitos) - 1;
+            foreach ($digitos as $key => $value) {
+                if($key === 0){
+                    $formated .= $value."-";
+                }else if($key === $lastKey){
+                    $formated .= '-'.$value;
+                }else {
+                    $formated .= $value;
+                }
+            }
+            
+        }
+        return $formated;
+    }
     
     public function getRif() {
         return $this->rif;
@@ -161,5 +191,22 @@ class Rif
         $this->rate = $rate;
     }
 
+    public function getOriginalRif() {
+        return $this->originalRif;
+    }
 
+    public function setOriginalRif($originalRif) {
+        $this->originalRif = $originalRif;
+        return $this;
+    }
+    
+    public function __toString() {
+        $rif = $this->originalRif;
+        if($this->isValid()){
+            $rif = sprintf("(%s) %s",$this->getRifFormated(),$this->name);
+        }else{
+            $rif = sprintf("%s (%s)",$this->originalRif,$this->message);
+        }
+        return $rif;
+    }
 }

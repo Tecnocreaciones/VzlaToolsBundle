@@ -20,16 +20,6 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('tecnocreaciones_vzla_tools');
         
-        $rootNode
-                ->children()
-                    ->arrayNode('rif')
-                        ->addDefaultsIfNotSet()
-                        ->children()
-                            ->booleanNode('translate_message')->defaultTrue()->cannotBeEmpty()->end()
-                    ->end();
-                ;
-        
-
         return $treeBuilder;
     }
 }
