@@ -46,6 +46,12 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
     
     protected $container;
 
+    /**
+     * Obtiene el rif
+     * @param type $rifString
+     * @return Rif
+     * @throws \Exception
+     */
     public function getRif($rifString){
         $rif = new Rif();
         $rif->setOriginalRif($rifString);
@@ -181,6 +187,12 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
         return true;
     }
     
+    /**
+     * Obtiene el digito verificador del rif
+     * @param type $rif
+     * @return string
+     * @link http://es.wikipedia.org/wiki/C%C3%B3digo_de_control#C.C3.A1lculo_del_d.C3.ADgito_verificador
+     */
     function getCheckDigit($rif) {
         $rif = str_replace('-', '', strtoupper($rif));
             $digitos = str_split($rif);
@@ -229,6 +241,11 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
         return $digitoVerificador;
     }
     
+    /**
+     * Completar un rif con cero a la izquerda
+     * @param type $rif
+     * @return type
+     */
     function completeLeftRif($rif) {
         $rif = $this->normalizeRif($rif);
         $digitos = str_split($rif);
@@ -254,11 +271,6 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
             
     }
     
-    private function getTypesRif() {
-        return ['V','E','J','P','G'];
-    }
-
-
     public function setContainer(\Symfony\Component\DependencyInjection\ContainerInterface $container = null) {
         $this->container = $container;
     }
