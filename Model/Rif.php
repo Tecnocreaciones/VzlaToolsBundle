@@ -84,7 +84,7 @@ class Rif
      * Verifica si el rif es valido
      * @var boolean
      */
-    private $valid = true;
+    private $valid = false;
     
     public function getRifFormated() {
         $formated = "";
@@ -132,8 +132,8 @@ class Rif
 
     public function setCodeResponse($codeResponse) {
         $this->codeResponse = $codeResponse;
-        if($this->codeResponse != self::STATUS_OK){
-            $this->valid = false;
+        if($this->codeResponse == self::STATUS_OK){
+            $this->valid = true;
         }
         return $this;
     }

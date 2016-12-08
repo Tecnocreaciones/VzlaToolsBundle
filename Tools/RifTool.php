@@ -33,12 +33,6 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
     private $_rif;
     
     /**
-     * 
-     * @var \Lsw\ApiCallerBundle\Caller\LoggingApiCaller 
-     */
-    protected $apiCaller;
-    
-    /**
      * Traductor
      * @var \Symfony\Component\Translation\TranslatorInterface
      */
@@ -63,8 +57,12 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
                 
                 $client = new \GuzzleHttp\Client();
                 $res = null;
+                $timeout = 4.00;
                 try{
-                    $res = $client->request('GET', $this->url.'?'.http_build_query($parameters));
+                    $res = $client->request('GET', $this->url.'?'.http_build_query($parameters),[
+                        'timeout' => $timeout,
+                        'connect_timeout' => $timeout,
+                    ]);
                 }  catch (\GuzzleHttp\Exception\RequestException $e){
                     if ($e->hasResponse()) {
                         if($e->getResponse()->getStatusCode() === 452){
@@ -72,6 +70,10 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
                                 ->setCodeResponse(Rif::STATUS_ERROR_RIF_DOES_NOT_EXIST)    
                                 ->setMessage(utf8_encode(((string)$e->getResponse()->getBody())));
                         }
+                    }else{
+                        $rif
+                        ->setCodeResponse(Rif::STATUS_ERROR_SERVER_DOWN)
+                        ->setMessage($this->buildMessage('tecnocreaciones.vzlatools.the_seniat_server_is_not_available_at_this_time'));
                     }
                 }
                 if($res === null){
