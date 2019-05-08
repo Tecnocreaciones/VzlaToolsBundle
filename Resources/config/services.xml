@@ -21,7 +21,7 @@
         <parameter key="tecnocreaciones_vzla_tools.rif_tool.class">Tecnocreaciones\Vzla\ToolsBundle\Tools\RifTool</parameter>
     </parameters>
     <services>
-        <service id="tecnocreaciones_vzla_tools.rif" class="%tecnocreaciones_vzla_tools.rif_tool.class%">
+        <service id="tecnocreaciones_vzla_tools.rif" class="%tecnocreaciones_vzla_tools.rif_tool.class%" public="true">
             <call method="setContainer">
                 <argument type="service" id="service_container" />
             </call>
