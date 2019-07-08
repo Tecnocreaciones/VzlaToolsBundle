@@ -183,7 +183,7 @@ class RifTool implements \Symfony\Component\DependencyInjection\ContainerAwareIn
 
             $digitoVerificador = $this->getCheckDigit($rif);
             
-            if ($digitoVerificador != $digitos[9]) {
+            if (!isset($digitos[9]) || $digitoVerificador != $digitos[9]) {
                 return false;
             }
         return true;
