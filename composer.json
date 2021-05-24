@@ -1,6 +1,6 @@
 {
     "name": "tecnocreaciones/vzla-tools-bundle",
-    "description": "Bundle for symfony2 for Venezuela Tools",
+    "description": "Bundle for symfony3 for Venezuela Tools",
     "license": "MIT",
     "authors": [
         {
@@ -11,7 +11,7 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/framework-bundle": "^3.0 || ^4.4",
-        "guzzlehttp/guzzle": "^6.2"
+        "guzzlehttp/guzzle": "~6.0"
     },
     "autoload": {
         "psr-0": { "Tecnocreaciones\\Vzla\\ToolsBundle": "" }
